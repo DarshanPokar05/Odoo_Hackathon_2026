@@ -2,6 +2,8 @@ import { AllocationRepository } from './allocation.repository';
 import { AllocateAssetDTO, ReturnAssetDTO, TransferRequestDTO } from './allocation.dto';
 import { NotFoundError, BusinessRuleError } from '../../shared/errors/customErrors';
 import prisma from '../../infrastructure/database/prisma';
+import { eventDispatcher } from '../../shared/events/eventDispatcher';
+import { AppEvents } from '../../shared/events/eventConstants';
 
 export class AllocationService {
   static async allocateAsset(data: AllocateAssetDTO, actionBy: string) {
@@ -25,7 +27,15 @@ export class AllocationService {
       conditionBefore: asset.condition,
     };
 
-    return AllocationRepository.executeAllocationTransaction(allocationData, data.assetId, actionBy);
+    const result = await AllocationRepository.executeAllocationTransaction(allocationData, data.assetId, actionBy);
+
+    eventDispatcher.dispatch(AppEvents.ASSET_ASSIGNED, {
+      userId: data.allocatedTo,
+      assetName: asset.name,
+      assetTag: asset.assetTag,
+    });
+
+    return result;
   }
 
   static async returnAsset(allocationId: string, data: ReturnAssetDTO, actionBy: string) {
@@ -33,7 +43,18 @@ export class AllocationService {
     if (!allocation) throw new NotFoundError('Allocation not found');
     if (allocation.status !== 'ACTIVE') throw new BusinessRuleError('Allocation is not active');
 
-    return AllocationRepository.executeReturnTransaction(allocationId, allocation.assetId, data, actionBy);
+    const result = await AllocationRepository.executeReturnTransaction(allocationId, allocation.assetId, data, actionBy);
+
+    const asset = await prisma.asset.findUnique({ where: { id: allocation.assetId } });
+    if (asset) {
+      eventDispatcher.dispatch(AppEvents.ASSET_RETURNED, {
+        userId: allocation.allocatedTo,
+        assetName: asset.name,
+        assetTag: asset.assetTag,
+      });
+    }
+
+    return result;
   }
 
   static async getActiveAllocations() {

@@ -8,6 +8,8 @@ import bookingRoutes, { resourceRoutes } from './modules/booking/booking.routes'
 import allocationRoutes from './modules/allocation/allocation.routes';
 import maintenanceRoutes from './modules/maintenance/maintenance.routes';
 import auditRoutes from './modules/audit/audit.routes';
+import { notificationRoutes } from './modules/notification/notification.routes';
+import { NotificationConsumer } from './modules/notification/notification.consumer';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
@@ -25,6 +27,10 @@ app.use('/api/v1/bookings', bookingRoutes);
 app.use('/api/v1/allocations', allocationRoutes);
 app.use('/api/v1/maintenance', maintenanceRoutes);
 app.use('/api/v1/audits', auditRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+
+// Initialize notification consumer
+NotificationConsumer.init();
 
 app.use(errorMiddleware);
 

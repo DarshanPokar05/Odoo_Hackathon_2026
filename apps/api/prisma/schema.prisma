@@ -116,6 +116,7 @@ model User {
   auditAssignments      AuditAssignment[] @relation("AuditAssignedTo")
   auditItemsVerified    AuditItem[] @relation("AuditItemVerifiedBy")
   discrepanciesResolved DiscrepancyReport[] @relation("DiscrepancyResolvedBy")
+  notifications         Notification[]
 
   @@map("users")
 }
@@ -510,5 +511,36 @@ model DiscrepancyReport {
 
   @@index([resolved])
   @@map("discrepancy_reports")
+}
+
+
+
+enum NotificationType {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String   @db.VarChar(255)
+  message   String   @db.Text
+  type      NotificationType
+  event     String   @db.VarChar(100)
+  isRead    Boolean  @default(false) @map("is_read")
+  readAt    DateTime? @map("read_at")
+  metadata  Json?    
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([event])
+  @@map("notifications")
 }
 
