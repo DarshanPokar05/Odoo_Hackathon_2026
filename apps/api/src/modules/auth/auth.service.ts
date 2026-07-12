@@ -16,7 +16,8 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    return await prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return prisma.$transaction(async (tx: any) => {
       const user = await tx.user.create({
         data: {
           firstName: data.firstName,
@@ -61,14 +62,17 @@ export class AuthService {
     }
 
     const accessToken = jwt.sign({ id: user.id, role: user.roleId }, JWT_SECRET, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any,
     });
 
     const refreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as any,
     });
 
-    await prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await prisma.$transaction(async (tx: any) => {
       await tx.user.update({
         where: { id: user.id },
         data: { lastLogin: new Date() },
@@ -107,10 +111,12 @@ export class AuthService {
       }
 
       const accessToken = jwt.sign({ id: user.id, role: user.roleId }, JWT_SECRET, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any,
       });
 
       const newRefreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as any,
       });
 
@@ -139,7 +145,8 @@ export class AuthService {
       return true;
     }
 
-    const resetToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const resetToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' as any });
     
     await prisma.activityLog.create({
       data: {
@@ -160,7 +167,8 @@ export class AuthService {
       const decoded = jwt.verify(data.token, JWT_SECRET) as JwtPayload & { id: string };
       const hashedPassword = await bcrypt.hash(data.newPassword, 10);
 
-      await prisma.$transaction(async (tx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return prisma.$transaction(async (tx: any) => {
         await tx.user.update({
           where: { id: decoded.id },
           data: { password: hashedPassword },

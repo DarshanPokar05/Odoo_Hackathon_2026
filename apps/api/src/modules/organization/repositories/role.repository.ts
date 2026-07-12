@@ -8,7 +8,8 @@ export class RoleRepository {
     return prisma.role.create({
       data: {
         ...roleData,
-        type: roleData.type as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        type: (roleData as any).type || 'EMPLOYEE',
         permissions: {
           create: permissionIds?.map(permissionId => ({
             permission: { connect: { id: permissionId } }
@@ -22,7 +23,8 @@ export class RoleRepository {
   static async update(id: string, data: UpdateRoleDTO) {
     const { permissionIds, ...roleData } = data;
     
-    return prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return prisma.$transaction(async (tx: any) => {
       // First update basic role details
       const _updatedRole = await tx.role.update({
         where: { id },

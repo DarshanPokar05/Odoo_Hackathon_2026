@@ -3,11 +3,18 @@ import { CreatePermissionDTO, UpdatePermissionDTO } from '../organization.dto';
 
 export class PermissionRepository {
   static async create(data: CreatePermissionDTO) {
-    return prisma.permission.create({ data });
+    const [action, resource = 'all'] = data.name.split(':');
+    return prisma.permission.create({ data: { action, resource, description: data.description } });
   }
 
   static async update(id: string, data: UpdatePermissionDTO) {
-    return prisma.permission.update({ where: { id }, data });
+    const updateData: Record<string, string> = { description: data.description! };
+    if (data.name) {
+      const [action, resource = 'all'] = data.name.split(':');
+      updateData.action = action;
+      updateData.resource = resource;
+    }
+    return prisma.permission.update({ where: { id }, data: updateData });
   }
 
   static async delete(id: string) {
@@ -24,6 +31,19 @@ export class PermissionRepository {
         action_resource: { action, resource }
       }
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static async assignPermissions(roleId: string, permissionIds: string[], tx?: any) {
+    const client = tx || prisma;
+    return client.rolePermission.createMany({
+      data: permissionIds.map((permissionId) => ({ roleId, permissionId })),
+    });
+  }
+
+  static async findByName(name: string) {
+    const [action, resource = 'all'] = name.split(':');
+    return prisma.permission.findFirst({ where: { action, resource } }); // Fallback or split if necessary
   }
 
   static async findAll() {

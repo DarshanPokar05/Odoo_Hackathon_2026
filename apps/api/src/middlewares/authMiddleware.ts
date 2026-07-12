@@ -32,7 +32,7 @@ export const authorize = (...requiredRoles: string[]) => {
       return next(new AuthenticationError('Not authenticated'));
     }
 
-    if (!requiredRoles.includes(req.user.role) && req.user.role !== 'ADMIN') {
+    if (!requiredRoles.includes(req.user.role) && req.user.role !== 'ADMIN' && req.user.role !== 'SYSTEM_ADMIN') {
       return next(new AuthorizationError(`Requires one of the roles: ${requiredRoles.join(', ')}`));
     }
 

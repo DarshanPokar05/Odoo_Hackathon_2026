@@ -1,6 +1,5 @@
 import prisma from '../../infrastructure/database/prisma';
 import { CreateUserDTO, UpdateUserDTO, UserQueryFilters, UpdateProfileDTO } from './user.dto';
-import { Prisma } from '@prisma/client';
 
 export class UserRepository {
   static async create(data: CreateUserDTO & { password: string; employeeCode: string; status: 'ACTIVE' }) {
@@ -87,7 +86,8 @@ export class UserRepository {
   }
 
   static async findAll(filters: UserQueryFilters) {
-    const whereClause: Prisma.UserWhereInput = { deletedAt: null };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const whereClause: any = { deletedAt: null };
 
     if (filters.departmentId) whereClause.departmentId = filters.departmentId;
     if (filters.roleId) whereClause.roleId = filters.roleId;

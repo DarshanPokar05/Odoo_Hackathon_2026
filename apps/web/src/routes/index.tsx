@@ -11,6 +11,8 @@ import { CreateAssetPage } from '@/modules/asset/pages/CreateAssetPage';
 import { EditAssetPage } from '@/modules/asset/pages/EditAssetPage';
 import { AssetDetailsPage } from '@/modules/asset/pages/AssetDetailsPage';
 import { AllocationListPage } from '@/modules/allocation/pages/AllocationListPage';
+import { MaintenanceListPage } from '@/modules/maintenance/pages/MaintenanceListPage';
+import { AuditListPage, AuditDetailsPage } from '../modules/audit';
 
 import {
   LoginPage,
@@ -52,8 +54,9 @@ export function AppRouter() {
             <Route path="/transfers" element={<div>Transfers</div>} />
             <Route path="/allocations" element={<AllocationListPage />} />
             <Route path="/bookings" element={<div>Bookings</div>} />
-            <Route path="/maintenance" element={<div>Maintenance</div>} />
-            <Route path="/audits" element={<div>Audits</div>} />
+            <Route path="/maintenance" element={<MaintenanceListPage />} />
+            <Route path="/audits" element={<AuditListPage />} />
+            <Route path="/audits/:id" element={<AuditDetailsPage />} />
             <Route path="/reports" element={<div>Reports</div>} />
             <Route path="/activity-logs" element={<div>Activity Logs</div>} />
             <Route path="/settings" element={<div>Settings</div>} />
