@@ -3,6 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Asset } from '../types';
+import { Input } from '../../../components/ui/Input';
+import { Select } from '../../../components/ui/Select';
+import { Button } from '../../../components/ui/Button';
+import { useCategories } from '../api';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required').max(150),
@@ -10,7 +14,7 @@ const schema = z.object({
   serialNumber: z.string().optional(),
   manufacturer: z.string().optional(),
   model: z.string().optional(),
-  acquisitionCost: z.number().optional(),
+  acquisitionCost: z.number().optional().nullable(),
   location: z.string().optional(),
   condition: z.enum(['NEW', 'GOOD', 'FAIR', 'POOR', 'BROKEN']),
   isBookable: z.boolean().default(false),
@@ -20,16 +24,16 @@ type FormData = z.infer<typeof schema>;
 
 interface AssetFormProps {
   initialData?: Asset;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: (data: any) => void;
+  onSubmit: (data: FormData) => void;
   isLoading: boolean;
 }
 
 export function AssetForm({ initialData, onSubmit, isLoading }: AssetFormProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { register, handleSubmit, formState: { errors } } = useForm<any>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(schema) as any,
+  const { data: categoriesResponse, isLoading: isLoadingCategories } = useCategories();
+  const categories = categoriesResponse?.data || [];
+
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
     defaultValues: {
       name: initialData?.name || '',
       categoryId: initialData?.categoryId || '',
@@ -44,74 +48,109 @@ export function AssetForm({ initialData, onSubmit, isLoading }: AssetFormProps) 
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-white p-6 rounded-lg shadow">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl bg-white p-6 rounded-lg shadow-sm border border-gray-200">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Asset Name *</label>
-          <input
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Asset Name *</label>
+          <Input
             {...register('name')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+            placeholder="e.g., MacBook Pro M3"
+            error={errors.name?.message}
           />
-          {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message as string}</p>}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Category ID *</label>
-          <input
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Category *</label>
+          <Select
             {...register('categoryId')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-            placeholder="UUID of Category"
-          />
-          {errors.categoryId && <p className="mt-1 text-sm text-red-600">{errors.categoryId.message as string}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Serial Number</label>
-          <input
-            {...register('serialNumber')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Manufacturer</label>
-          <input
-            {...register('manufacturer')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Model</label>
-          <input
-            {...register('model')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Condition</label>
-          <select
-            {...register('condition')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+            error={errors.categoryId?.message}
+            disabled={isLoadingCategories}
           >
+            <option value="">Select Category</option>
+            {categories.map((cat: any) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Serial Number</label>
+          <Input
+            {...register('serialNumber')}
+            placeholder="e.g., C02XYZ1234"
+            error={errors.serialNumber?.message}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Manufacturer</label>
+          <Input
+            {...register('manufacturer')}
+            placeholder="e.g., Apple"
+            error={errors.manufacturer?.message}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Model</label>
+          <Input
+            {...register('model')}
+            placeholder="e.g., A2992"
+            error={errors.model?.message}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Acquisition Cost</label>
+          <Input
+            type="number"
+            step="0.01"
+            {...register('acquisitionCost', { valueAsNumber: true })}
+            placeholder="e.g., 1999.99"
+            error={errors.acquisitionCost?.message}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Location</label>
+          <Input
+            {...register('location')}
+            placeholder="e.g., Building A, Room 101"
+            error={errors.location?.message}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">Condition</label>
+          <Select {...register('condition')} error={errors.condition?.message}>
             <option value="NEW">New</option>
             <option value="GOOD">Good</option>
             <option value="FAIR">Fair</option>
             <option value="POOR">Poor</option>
             <option value="BROKEN">Broken</option>
-          </select>
+          </Select>
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
-        <button
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="isBookable"
+          {...register('isBookable')}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="isBookable" className="text-sm font-medium text-gray-700">
+          Available for Booking
+        </label>
+      </div>
+
+      <div className="flex justify-end pt-4 border-t border-gray-100">
+        <Button
           type="submit"
           disabled={isLoading}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
         >
           {isLoading ? 'Saving...' : 'Save Asset'}
-        </button>
+        </Button>
       </div>
     </form>
   );

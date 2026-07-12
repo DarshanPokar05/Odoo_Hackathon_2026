@@ -72,3 +72,10 @@ export function useDeleteAsset() {
     },
   });
 }
+
+export function useCategories() {
+  return useQuery<{ data: { id: string; name: string }[] }>({
+    queryKey: ['categories'],
+    queryFn: () => fetchApi('/organization/categories'),
+  });
+}
