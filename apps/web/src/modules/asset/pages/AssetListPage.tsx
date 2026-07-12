@@ -20,7 +20,7 @@ export function AssetListPage() {
     if (window.confirm('Are you sure you want to delete this asset?')) {
       deleteAsset(id, {
         onSuccess: () => toast.success('Asset deleted successfully'),
-        onError: (err: any) => toast.error(err.message || 'Failed to delete asset'),
+        onError: (err: Error) => toast.error(err.message || 'Failed to delete asset'),
       });
     }
   };

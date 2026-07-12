@@ -446,6 +446,79 @@ paths:
         '200':
           description: Booking cancelled successfully
 
+  /reports/assets:
+    get:
+      summary: Get Asset Utilization Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/allocations:
+    get:
+      summary: Get Allocation Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/maintenance:
+    get:
+      summary: Get Maintenance Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/bookings:
+    get:
+      summary: Get Booking Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/audits:
+    get:
+      summary: Get Audit Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/export/csv:
+    get:
+      summary: Export Assets CSV
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: CSV Stream
+  /reports/export/excel:
+    get:
+      summary: Export Assets Excel
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Excel Stream
+  /reports/export/pdf:
+    get:
+      summary: Export Assets PDF
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: PDF Stream
+
 components:
   securitySchemes:
     bearerAuth:

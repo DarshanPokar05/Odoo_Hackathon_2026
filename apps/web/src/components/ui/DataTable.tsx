@@ -13,7 +13,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   pageCount?: number
-  onPaginationChange?: (updater: any) => void
+  onPaginationChange?: (updater: unknown) => void
   pagination?: {
     pageIndex: number
     pageSize: number

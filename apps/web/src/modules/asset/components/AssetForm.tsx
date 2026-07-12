@@ -65,7 +65,7 @@ export function AssetForm({ initialData, onSubmit, isLoading }: AssetFormProps) 
             disabled={isLoadingCategories}
           >
             <option value="">Select Category</option>
-            {categories.map((cat: any) => (
+            {categories.map((cat: { id: string; name: string }) => (
               <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </Select>
