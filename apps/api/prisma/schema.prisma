@@ -104,9 +104,13 @@ model User {
   createdAssets       Asset[]
   assetHistory        AssetHistory[]
   allocationsReceived AssetAllocation[] @relation("AllocatedTo")
-  allocationsCreated  AssetAllocation[] @relation("AllocatedBy")
-  transfersRequested  TransferRequest[] @relation("RequestedBy")
-  transfersReceived   TransferRequest[] @relation("RequestedTo")
+  allocationsCreated    AssetAllocation[] @relation("AllocatedBy")
+  transfersRequested    TransferRequest[] @relation("RequestedBy")
+  transfersReceived     TransferRequest[] @relation("RequestedTo")
+  maintenanceReported   MaintenanceRequest[] @relation("MaintenanceReportedBy")
+  maintenanceApproved   MaintenanceRequest[] @relation("MaintenanceApprovedBy")
+  maintenanceAssigned   MaintenanceRequest[] @relation("MaintenanceAssignedTo")
+  maintenanceHistory    MaintenanceHistory[]
 
   @@map("users")
 }
@@ -197,10 +201,11 @@ model Asset {
   creator          User?             @relation(fields: [createdBy], references: [id])
   images           AssetImage[]
   documents        AssetDocument[]
-  history          AssetHistory[]
-  resources        Resource[]
-  allocations      AssetAllocation[]
-  transferRequests TransferRequest[]
+  history            AssetHistory[]
+  resources          Resource[]
+  allocations        AssetAllocation[]
+  transferRequests   TransferRequest[]
+  maintenanceRequests MaintenanceRequest[]
 
   @@index([assetTag])
   @@index([serialNumber])
@@ -343,3 +348,64 @@ model TransferRequest {
 
   @@map("transfer_requests")
 }
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MaintenanceStatus {
+  PENDING
+  APPROVED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  CLOSED
+}
+
+model MaintenanceRequest {
+  id          String              @id @default(uuid()) @db.Uuid
+  assetId     String              @map("asset_id") @db.Uuid
+  reportedBy  String              @map("reported_by") @db.Uuid
+  priority    MaintenancePriority @default(LOW)
+  description String              @db.Text
+  photoUrl    String?             @map("photo_url") @db.Text
+  status      MaintenanceStatus   @default(PENDING)
+  approvedBy  String?             @map("approved_by") @db.Uuid
+  assignedTo  String?             @map("assigned_to") @db.Uuid
+  resolvedAt  DateTime?           @map("resolved_at")
+  remarks     String?             @db.Text
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  asset           Asset                @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  userReportedBy  User                 @relation("MaintenanceReportedBy", fields: [reportedBy], references: [id])
+  userApprovedBy  User?                @relation("MaintenanceApprovedBy", fields: [approvedBy], references: [id])
+  userAssignedTo  User?                @relation("MaintenanceAssignedTo", fields: [assignedTo], references: [id])
+  history         MaintenanceHistory[]
+
+  @@index([assetId])
+  @@index([status])
+  @@index([reportedBy])
+  @@index([assignedTo])
+  @@map("maintenance_requests")
+}
+
+model MaintenanceHistory {
+  id                   String            @id @default(uuid()) @db.Uuid
+  maintenanceRequestId String            @map("maintenance_request_id") @db.Uuid
+  status               MaintenanceStatus
+  remarks              String?           @db.Text
+  updatedBy            String?           @map("updated_by") @db.Uuid
+  createdAt            DateTime          @default(now()) @map("created_at")
+
+  maintenanceRequest MaintenanceRequest @relation(fields: [maintenanceRequestId], references: [id], onDelete: Cascade)
+  userUpdatedBy      User?              @relation(fields: [updatedBy], references: [id])
+
+  @@index([maintenanceRequestId])
+  @@map("maintenance_history")
+}
+

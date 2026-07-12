@@ -30,7 +30,8 @@ export class PermissionService {
       throw new NotFoundError('Permission not found');
     }
 
-    if (data.name && data.name !== permission.name) {
+    const permName = `${permission.action}:${permission.resource}`;
+    if (data.name && data.name !== permName) {
       const existingName = await PermissionRepository.findByName(data.name);
       if (existingName) {
         throw new BusinessRuleError('Permission name must be unique');

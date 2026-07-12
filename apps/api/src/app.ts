@@ -6,6 +6,7 @@ import userRoutes from './modules/user/user.routes';
 import assetRoutes from './modules/asset/asset.routes';
 import bookingRoutes, { resourceRoutes } from './modules/booking/booking.routes';
 import allocationRoutes from './modules/allocation/allocation.routes';
+import maintenanceRoutes from './modules/maintenance/maintenance.routes';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/v1/assets', assetRoutes);
 app.use('/api/v1/resources', resourceRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
 app.use('/api/v1/allocations', allocationRoutes);
+app.use('/api/v1/maintenance', maintenanceRoutes);
 
 app.use(errorMiddleware);
 

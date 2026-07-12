@@ -24,10 +24,13 @@
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.12.12",
+    "jest": "^30.4.2",
     "nodemon": "^3.1.0",
     "prisma": "^5.14.0",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }

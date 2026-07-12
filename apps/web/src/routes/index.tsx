@@ -11,6 +11,7 @@ import { CreateAssetPage } from '@/modules/asset/pages/CreateAssetPage';
 import { EditAssetPage } from '@/modules/asset/pages/EditAssetPage';
 import { AssetDetailsPage } from '@/modules/asset/pages/AssetDetailsPage';
 import { AllocationListPage } from '@/modules/allocation/pages/AllocationListPage';
+import { MaintenanceListPage } from '@/modules/maintenance/pages/MaintenanceListPage';
 
 // Temporary Mock Pages for Routing Setup
 const MockLogin = () => <div className="p-8 bg-card rounded-xl border border-border shadow-sm text-center"><h2 className="text-2xl font-bold mb-4">Login Page</h2><button className="px-4 py-2 bg-primary text-primary-foreground rounded-md" onClick={() => localStorage.setItem('auth_token', 'mock_token')}>Mock Login</button></div>;
@@ -43,7 +44,7 @@ export function AppRouter() {
             <Route path="/transfers" element={<div>Transfers</div>} />
             <Route path="/allocations" element={<AllocationListPage />} />
             <Route path="/bookings" element={<div>Bookings</div>} />
-            <Route path="/maintenance" element={<div>Maintenance</div>} />
+            <Route path="/maintenance" element={<MaintenanceListPage />} />
             <Route path="/audits" element={<div>Audits</div>} />
             <Route path="/reports" element={<div>Reports</div>} />
             <Route path="/activity-logs" element={<div>Activity Logs</div>} />

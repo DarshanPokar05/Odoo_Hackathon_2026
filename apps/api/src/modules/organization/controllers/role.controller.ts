@@ -5,7 +5,7 @@ import { sendSuccess } from '../../../shared/responses/apiResponse';
 export class RoleController {
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await RoleService.create(req.body, req.user.id);
+      const result = await RoleService.create(req.body, req.user!.id);
       return sendSuccess(res, result, 'Role created successfully', 201);
     } catch (error) {
       next(error);
@@ -14,7 +14,7 @@ export class RoleController {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await RoleService.update(req.params.id, req.body, req.user.id);
+      const result = await RoleService.update(req.params.id, req.body, req.user!.id);
       return sendSuccess(res, result, 'Role updated successfully', 200);
     } catch (error) {
       next(error);
@@ -23,7 +23,7 @@ export class RoleController {
 
   static async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await RoleService.delete(req.params.id, req.user.id);
+      await RoleService.delete(req.params.id, req.user!.id);
       return sendSuccess(res, null, 'Role deleted successfully', 200);
     } catch (error) {
       next(error);

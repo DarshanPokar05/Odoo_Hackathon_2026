@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AllocationController } from './allocation.controller';
-import { authenticate, authorize } from '../../shared/middleware/auth';
-import { validate } from '../../shared/middleware/validate';
+import { authenticate, authorize } from '../../middlewares/authMiddleware';
+import { validate } from '../../middlewares/validationMiddleware';
 import { 
   AllocateAssetSchema, 
   ReturnAssetSchema, 

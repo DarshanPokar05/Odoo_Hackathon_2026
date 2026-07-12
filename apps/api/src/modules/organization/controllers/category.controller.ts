@@ -5,7 +5,7 @@ import { sendSuccess } from '../../../shared/responses/apiResponse';
 export class CategoryController {
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await CategoryService.create(req.body, req.user.id);
+      const result = await CategoryService.create(req.body, req.user!.id);
       return sendSuccess(res, result, 'Category created successfully', 201);
     } catch (error) {
       next(error);
@@ -14,7 +14,7 @@ export class CategoryController {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await CategoryService.update(req.params.id, req.body, req.user.id);
+      const result = await CategoryService.update(req.params.id, req.body, req.user!.id);
       return sendSuccess(res, result, 'Category updated successfully', 200);
     } catch (error) {
       next(error);
@@ -23,7 +23,7 @@ export class CategoryController {
 
   static async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await CategoryService.deactivate(req.params.id, req.user.id);
+      await CategoryService.deactivate(req.params.id, req.user!.id);
       return sendSuccess(res, null, 'Category deactivated successfully', 200);
     } catch (error) {
       next(error);

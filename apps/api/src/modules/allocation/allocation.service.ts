@@ -73,7 +73,8 @@ export class AllocationService {
     if (transfer.status !== 'PENDING') throw new BusinessRuleError('Transfer request is not pending');
 
     // Transfer Logic
-    return prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await prisma.$transaction(async (tx: any) => {
       // 1. Approve transfer
       await tx.transferRequest.update({
         where: { id: transferId },

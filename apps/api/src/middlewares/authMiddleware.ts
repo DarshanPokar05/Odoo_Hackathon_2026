@@ -19,21 +19,22 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super-secret-jwt-key');
-    req.user = decoded;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    req.user = decoded as any;
     next();
   } catch (error) {
     next(new AuthenticationError('Invalid or expired token'));
   }
 };
 
-export const authorize = (requiredRole: string) => {
+export const authorize = (...requiredRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AuthenticationError('Not authenticated'));
     }
 
-    if (req.user.role !== requiredRole && req.user.role !== 'ADMIN') {
-      return next(new AuthorizationError(`Requires role: ${requiredRole}`));
+    if (!requiredRoles.includes(req.user.role) && req.user.role !== 'ADMIN' && req.user.role !== 'SYSTEM_ADMIN') {
+      return next(new AuthorizationError(`Requires one of roles: ${requiredRoles.join(', ')}`));
     }
 
     next();

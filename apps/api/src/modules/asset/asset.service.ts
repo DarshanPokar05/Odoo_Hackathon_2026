@@ -6,7 +6,8 @@ import prisma from '../../infrastructure/database/prisma';
 
 export class AssetService {
   static async registerAsset(data: CreateAssetDTO, userId: string) {
-    return await prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await prisma.$transaction(async (tx: any) => {
       // Generate Asset Tag
       const count = await AssetRepository.count();
       const assetTag = `AST-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
@@ -59,7 +60,8 @@ export class AssetService {
       throw new BusinessRuleError('Cannot edit a disposed asset', 'ASSET_DISPOSED');
     }
 
-    return await prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await prisma.$transaction(async (tx: any) => {
       const updatedAsset = await AssetRepository.update(id, data, tx);
 
       await AssetRepository.createActivityLog(
@@ -120,7 +122,8 @@ export class AssetService {
       throw new BusinessRuleError('Cannot delete asset while in active use', 'ASSET_IN_USE');
     }
 
-    return await prisma.$transaction(async (tx) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await prisma.$transaction(async (tx: any) => {
       await AssetRepository.softDelete(id, tx);
 
       await AssetRepository.createActivityLog(
