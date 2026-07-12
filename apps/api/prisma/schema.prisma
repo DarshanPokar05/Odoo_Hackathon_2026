@@ -7,61 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RoleType {
+  SYSTEM_ADMIN
+  ASSET_MANAGER
+  DEPARTMENT_HEAD
+  MAINTENANCE_TECHNICIAN
+  AUDITOR
+  EMPLOYEE
+}
+
 enum Status {
   ACTIVE
   INACTIVE
 }
 
-model Department {
-  id                 String       @id @default(uuid()) @db.Uuid
-  name               String       @db.VarChar(100)
-  code               String       @unique @db.VarChar(20)
-  parentDepartmentId String?      @map("parent_department_id") @db.Uuid
-  headId             String?      @map("head_id") @db.Uuid
-  status             Status       @default(ACTIVE)
-  createdAt          DateTime     @default(now()) @map("created_at")
-  updatedAt          DateTime     @updatedAt @map("updated_at")
-  deletedAt          DateTime?    @map("deleted_at")
-
-  parentDepartment   Department?  @relation("DepartmentToDepartment", fields: [parentDepartmentId], references: [id])
-  childDepartments   Department[] @relation("DepartmentToDepartment")
-  users              User[]
-
-  @@map("departments")
-}
-
 model Role {
   id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique
+  name        String   @unique @db.VarChar(50)
   description String?
+  type        RoleType @unique
+  isSystem    Boolean  @default(false) @map("is_system")
   createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  users           User[]
-  rolePermissions RolePermission[]
+  users       User[]
 
   @@map("roles")
 }
 
-model Permission {
+model Department {
   id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique
+  name        String   @unique @db.VarChar(100)
+  code        String   @unique @db.VarChar(20)
   description String?
+  managerId   String?  @map("manager_id") @db.Uuid
+  status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
 
-  rolePermissions RolePermission[]
+  users       User[]
 
-  @@map("permissions")
-}
-
-model RolePermission {
-  roleId       String @map("role_id") @db.Uuid
-  permissionId String @map("permission_id") @db.Uuid
-
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@id([roleId, permissionId])
-  @@map("role_permissions")
+  @@map("departments")
 }
 
 model User {
@@ -81,9 +68,12 @@ model User {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  role          Role?       @relation(fields: [roleId], references: [id])
-  department    Department? @relation(fields: [departmentId], references: [id])
+  role          Role?          @relation(fields: [roleId], references: [id])
+  department    Department?    @relation(fields: [departmentId], references: [id])
   activityLogs  ActivityLog[]
+  bookings      Booking[]
+  createdAssets Asset[]
+  assetHistory  AssetHistory[]
 
   @@map("users")
 }
@@ -116,5 +106,149 @@ model AssetCategory {
   updatedAt   DateTime @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
+  assets      Asset[]
+
   @@map("asset_categories")
+}
+
+enum Condition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+  BROKEN
+}
+
+enum AssetStatus {
+  AVAILABLE
+  ALLOCATED
+  RESERVED
+  UNDER_MAINTENANCE
+  DISPOSED
+}
+
+model Asset {
+  id               String       @id @default(uuid()) @db.Uuid
+  assetTag         String       @unique @map("asset_tag") @db.VarChar(50)
+  name             String       @db.VarChar(150)
+  categoryId       String       @map("category_id") @db.Uuid
+  serialNumber     String?      @map("serial_number") @db.VarChar(100)
+  manufacturer     String?      @db.VarChar(100)
+  model            String?      @db.VarChar(100)
+  acquisitionDate  DateTime?    @map("acquisition_date") @db.Date
+  acquisitionCost  Decimal?     @map("acquisition_cost") @db.Decimal(10, 2)
+  currentValue     Decimal?     @map("current_value") @db.Decimal(10, 2)
+  location         String?      @db.VarChar(200)
+  condition        Condition    @default(NEW)
+  status           AssetStatus  @default(AVAILABLE)
+  isBookable       Boolean      @default(false) @map("is_bookable")
+  createdBy        String?      @map("created_by") @db.Uuid
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  deletedAt        DateTime?    @map("deleted_at")
+
+  category         AssetCategory @relation(fields: [categoryId], references: [id])
+  creator          User?         @relation(fields: [createdBy], references: [id])
+  images           AssetImage[]
+  documents        AssetDocument[]
+  history          AssetHistory[]
+  resources        Resource[]
+
+  @@index([assetTag])
+  @@index([serialNumber])
+  @@index([status])
+  @@index([categoryId])
+  @@index([location])
+  @@map("assets")
+}
+
+model AssetImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  assetId      String   @map("asset_id") @db.Uuid
+  imageUrl     String   @map("image_url") @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_images")
+}
+
+model AssetDocument {
+  id           String   @id @default(uuid()) @db.Uuid
+  assetId      String   @map("asset_id") @db.Uuid
+  documentName String   @map("document_name") @db.VarChar(255)
+  documentUrl  String   @map("document_url") @db.Text
+  documentType String   @map("document_type") @db.VarChar(50)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_documents")
+}
+
+model AssetHistory {
+  id             String   @id @default(uuid()) @db.Uuid
+  assetId        String   @map("asset_id") @db.Uuid
+  action         String   @db.VarChar(100)
+  previousValue  String?  @map("previous_value") @db.Text
+  newValue       String?  @map("new_value") @db.Text
+  performedBy    String?  @map("performed_by") @db.Uuid
+  performedAt    DateTime @default(now()) @map("performed_at")
+  remarks        String?  @db.Text
+
+  asset          Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  performer      User?    @relation(fields: [performedBy], references: [id])
+
+  @@map("asset_history")
+}
+
+enum BookingStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model Resource {
+  id           String    @id @default(uuid()) @db.Uuid
+  assetId      String?   @map("asset_id") @db.Uuid
+  name         String    @db.VarChar(100)
+  resourceType String    @map("resource_type") @db.VarChar(50)
+  capacity     Int       @default(1)
+  location     String    @db.VarChar(255)
+  status       Status    @default(ACTIVE)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  asset        Asset?    @relation(fields: [assetId], references: [id])
+  bookings     Booking[]
+
+  @@index([resourceType])
+  @@index([status])
+  @@index([location])
+  @@map("resources")
+}
+
+model Booking {
+  id         String        @id @default(uuid()) @db.Uuid
+  resourceId String        @map("resource_id") @db.Uuid
+  bookedBy   String        @map("booked_by") @db.Uuid
+  startTime  DateTime      @map("start_time")
+  endTime    DateTime      @map("end_time")
+  purpose    String        @db.VarChar(255)
+  status     BookingStatus @default(UPCOMING)
+  remarks    String?       @db.Text
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  resource   Resource      @relation(fields: [resourceId], references: [id])
+  booker     User          @relation(fields: [bookedBy], references: [id])
+
+  @@index([resourceId])
+  @@index([bookedBy])
+  @@index([startTime, endTime])
+  @@index([status])
+  @@map("bookings")
 }
