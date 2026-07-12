@@ -76,6 +76,7 @@ model Department {
   parentDepartment Department?  @relation("DepartmentToDepartment", fields: [parentDepartmentId], references: [id])
   childDepartments Department[] @relation("DepartmentToDepartment")
   users            User[]
+  auditCycles      AuditCycle[]
 
   @@map("departments")
 }
@@ -111,6 +112,10 @@ model User {
   maintenanceApproved   MaintenanceRequest[] @relation("MaintenanceApprovedBy")
   maintenanceAssigned   MaintenanceRequest[] @relation("MaintenanceAssignedTo")
   maintenanceHistory    MaintenanceHistory[]
+  auditsCreated         AuditCycle[] @relation("AuditCreatedBy")
+  auditAssignments      AuditAssignment[] @relation("AuditAssignedTo")
+  auditItemsVerified    AuditItem[] @relation("AuditItemVerifiedBy")
+  discrepanciesResolved DiscrepancyReport[] @relation("DiscrepancyResolvedBy")
 
   @@map("users")
 }
@@ -206,6 +211,7 @@ model Asset {
   allocations        AssetAllocation[]
   transferRequests   TransferRequest[]
   maintenanceRequests MaintenanceRequest[]
+  auditItems         AuditItem[]
 
   @@index([assetTag])
   @@index([serialNumber])
@@ -407,5 +413,102 @@ model MaintenanceHistory {
 
   @@index([maintenanceRequestId])
   @@map("maintenance_history")
+}
+
+enum AuditStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  MISSING
+  DAMAGED
+}
+
+enum DiscrepancySeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model AuditCycle {
+  id           String      @id @default(uuid()) @db.Uuid
+  title        String      @db.VarChar(255)
+  departmentId String      @map("department_id") @db.Uuid
+  location     String?     @db.VarChar(255)
+  startDate    DateTime    @map("start_date") @db.Date
+  endDate      DateTime    @map("end_date") @db.Date
+  status       AuditStatus @default(DRAFT)
+  createdBy    String      @map("created_by") @db.Uuid
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  department   Department        @relation(fields: [departmentId], references: [id])
+  creator      User              @relation("AuditCreatedBy", fields: [createdBy], references: [id])
+  assignments  AuditAssignment[]
+  items        AuditItem[]
+
+  @@index([departmentId])
+  @@index([status])
+  @@map("audit_cycles")
+}
+
+model AuditAssignment {
+  id           String   @id @default(uuid()) @db.Uuid
+  auditCycleId String   @map("audit_cycle_id") @db.Uuid
+  auditorId    String   @map("auditor_id") @db.Uuid
+  assignedAt   DateTime @default(now()) @map("assigned_at")
+
+  auditCycle AuditCycle @relation(fields: [auditCycleId], references: [id], onDelete: Cascade)
+  auditor    User       @relation("AuditAssignedTo", fields: [auditorId], references: [id])
+
+  @@unique([auditCycleId, auditorId])
+  @@index([auditCycleId])
+  @@index([auditorId])
+  @@map("audit_assignments")
+}
+
+model AuditItem {
+  id                 String             @id @default(uuid()) @db.Uuid
+  auditCycleId       String             @map("audit_cycle_id") @db.Uuid
+  assetId            String             @map("asset_id") @db.Uuid
+  verificationStatus VerificationStatus @default(PENDING) @map("verification_status")
+  remarks            String?            @db.Text
+  verifiedBy         String?            @map("verified_by") @db.Uuid
+  verifiedAt         DateTime?          @map("verified_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  auditCycle AuditCycle         @relation(fields: [auditCycleId], references: [id], onDelete: Cascade)
+  asset      Asset              @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  verifier   User?              @relation("AuditItemVerifiedBy", fields: [verifiedBy], references: [id])
+  report     DiscrepancyReport?
+
+  @@unique([auditCycleId, assetId])
+  @@index([auditCycleId])
+  @@index([assetId])
+  @@index([verificationStatus])
+  @@map("audit_items")
+}
+
+model DiscrepancyReport {
+  id           String              @id @default(uuid()) @db.Uuid
+  auditItemId  String              @unique @map("audit_item_id") @db.Uuid
+  severity     DiscrepancySeverity @default(MEDIUM)
+  description  String              @db.Text
+  resolved     Boolean             @default(false)
+  resolvedBy   String?             @map("resolved_by") @db.Uuid
+  resolvedAt   DateTime?           @map("resolved_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+
+  auditItem AuditItem @relation(fields: [auditItemId], references: [id], onDelete: Cascade)
+  resolver  User?     @relation("DiscrepancyResolvedBy", fields: [resolvedBy], references: [id])
+
+  @@index([resolved])
+  @@map("discrepancy_reports")
 }
 

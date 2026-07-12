@@ -20,8 +20,6 @@ const schema = z.object({
   isBookable: z.boolean().default(false),
 });
 
-type FormData = z.infer<typeof schema>;
-
 interface AssetFormProps {
   initialData?: Asset;
   onSubmit: (data: FormData) => void;

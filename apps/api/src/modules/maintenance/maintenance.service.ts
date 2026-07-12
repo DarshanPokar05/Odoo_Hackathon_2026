@@ -62,7 +62,7 @@ export class MaintenanceService {
       AssetStatus.UNDER_MAINTENANCE,
       userId,
       data.remarks,
-      { approvedBy: userId } as any
+      { approvedBy: userId } as Record<string, unknown>
     );
   }
 
@@ -78,7 +78,7 @@ export class MaintenanceService {
       null,
       userId,
       data.remarks,
-      { approvedBy: userId } as any
+      { approvedBy: userId } as Record<string, unknown>
     );
   }
 
@@ -94,7 +94,7 @@ export class MaintenanceService {
       null,
       userId,
       'Technician assigned',
-      { assignedTo: data.technicianId } as any
+      { assignedTo: data.technicianId } as Record<string, unknown>
     );
   }
 

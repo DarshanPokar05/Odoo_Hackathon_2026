@@ -5,8 +5,8 @@ services:
     image: postgres:15-alpine
     container_name: assetflow_db
     environment:
-      POSTGRES_USER: assetflow
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Nisarg@2006
       POSTGRES_DB: assetflow_db
     ports:
       - "5432:5432"

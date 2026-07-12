@@ -1,5 +1,4 @@
 import prisma from '../../../infrastructure/database/prisma';
-import { Prisma } from '@prisma/client';
 import { CreateCategoryDTO, UpdateCategoryDTO } from '../organization.dto';
 
 export class CategoryRepository {

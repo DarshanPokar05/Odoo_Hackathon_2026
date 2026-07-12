@@ -1,6 +1,5 @@
 import prisma from '../../infrastructure/database/prisma';
 import { CreateUserDTO, UpdateUserDTO, UserQueryFilters, UpdateProfileDTO } from './user.dto';
-import { Prisma } from '@prisma/client';
 
 export class UserRepository {
   static async create(data: CreateUserDTO & { password: string; employeeCode: string; status: 'ACTIVE' }) {

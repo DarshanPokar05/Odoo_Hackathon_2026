@@ -8,7 +8,7 @@ export class PermissionRepository {
   }
 
   static async update(id: string, data: UpdatePermissionDTO) {
-    const updateData: any = { description: data.description };
+    const updateData: Record<string, string> = { description: data.description! };
     if (data.name) {
       const [action, resource = 'all'] = data.name.split(':');
       updateData.action = action;
@@ -23,6 +23,14 @@ export class PermissionRepository {
 
   static async findById(id: string) {
     return prisma.permission.findUnique({ where: { id } });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static async assignPermissions(roleId: string, permissionIds: string[], tx?: any) {
+    const client = tx || prisma;
+    return client.rolePermission.createMany({
+      data: permissionIds.map((permissionId) => ({ roleId, permissionId })),
+    });
   }
 
   static async findByName(name: string) {
