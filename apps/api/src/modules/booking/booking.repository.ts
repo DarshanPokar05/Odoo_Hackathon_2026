@@ -63,13 +63,13 @@ export class BookingRepository {
     }
     if (filters.status) whereClause.status = filters.status;
 
-    const page = Math.max(1, Number((filters as any).page ?? 1) || 1);
-    const limit = Math.max(1, Math.min(100, Number((filters as any).limit ?? 20) || 20));
+    const page = Math.max(1, Number((filters as any /* eslint-disable-line @typescript-eslint/no-explicit-any */).page ?? 1) || 1);
+    const limit = Math.max(1, Math.min(100, Number((filters as any /* eslint-disable-line @typescript-eslint/no-explicit-any */).limit ?? 20) || 20));
     const skip = (page - 1) * limit;
 
     const allowedSortBy = ['name', 'resourceType', 'capacity', 'createdAt'] as const;
-    const sortBy = allowedSortBy.includes((filters as any).sortBy) ? (filters as any).sortBy : 'name';
-    const sortOrder = (filters as any).sortOrder === 'desc' ? 'desc' : 'asc';
+    const sortBy = allowedSortBy.includes((filters as any /* eslint-disable-line @typescript-eslint/no-explicit-any */).sortBy) ? (filters as any /* eslint-disable-line @typescript-eslint/no-explicit-any */).sortBy : 'name';
+    const sortOrder = (filters as any /* eslint-disable-line @typescript-eslint/no-explicit-any */).sortOrder === 'desc' ? 'desc' : 'asc';
     const [items, total] = await Promise.all([
       prisma.resource.findMany({
         where: whereClause,

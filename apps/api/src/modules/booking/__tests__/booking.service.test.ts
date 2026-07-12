@@ -1,6 +1,6 @@
 import { BookingService } from '../booking.service';
 import { BookingRepository } from '../booking.repository';
-import prisma from '../../../infrastructure/database/prisma';
+
 import { ConflictError, BusinessRuleError, AuthorizationError } from '../../../shared/errors/customErrors';
 
 jest.mock('../booking.repository');

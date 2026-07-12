@@ -49,7 +49,8 @@ export class BookingController {
 
   static async getAllResources(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await BookingService.getAllResources(req.query as any);
+      const result = await BookingService.getAllResources(req.query as any // eslint-disable-line @typescript-eslint/no-explicit-any
+      );
       return sendSuccess(res, result, 'Resources fetched successfully', 200);
     } catch (error) {
       next(error);
@@ -58,7 +59,8 @@ export class BookingController {
 
   static async getAvailableResources(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await BookingService.getAvailableResources(req.query as any);
+      const result = await BookingService.getAvailableResources(req.query as any // eslint-disable-line @typescript-eslint/no-explicit-any
+      );
       return sendSuccess(res, result, 'Available resources fetched successfully', 200);
     } catch (error) {
       next(error);
@@ -90,7 +92,8 @@ export class BookingController {
 
   static async getAllBookings(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await BookingService.getAllBookings(req.query as any);
+      const result = await BookingService.getAllBookings(req.query as any // eslint-disable-line @typescript-eslint/no-explicit-any
+      );
       return sendSuccess(res, result, 'Bookings fetched successfully', 200);
     } catch (error) {
       next(error);
