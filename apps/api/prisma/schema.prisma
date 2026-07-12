@@ -84,6 +84,8 @@ model User {
   role          Role?       @relation(fields: [roleId], references: [id])
   department    Department? @relation(fields: [departmentId], references: [id])
   activityLogs  ActivityLog[]
+  createdAssets Asset[]
+  assetHistory  AssetHistory[]
 
   @@map("users")
 }
@@ -116,5 +118,98 @@ model AssetCategory {
   updatedAt   DateTime @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
+  assets      Asset[]
+
   @@map("asset_categories")
+}
+
+enum Condition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+  BROKEN
+}
+
+enum AssetStatus {
+  AVAILABLE
+  ALLOCATED
+  RESERVED
+  UNDER_MAINTENANCE
+  DISPOSED
+}
+
+model Asset {
+  id               String       @id @default(uuid()) @db.Uuid
+  assetTag         String       @unique @map("asset_tag") @db.VarChar(50)
+  name             String       @db.VarChar(150)
+  categoryId       String       @map("category_id") @db.Uuid
+  serialNumber     String?      @map("serial_number") @db.VarChar(100)
+  manufacturer     String?      @db.VarChar(100)
+  model            String?      @db.VarChar(100)
+  acquisitionDate  DateTime?    @map("acquisition_date") @db.Date
+  acquisitionCost  Decimal?     @map("acquisition_cost") @db.Decimal(10, 2)
+  currentValue     Decimal?     @map("current_value") @db.Decimal(10, 2)
+  location         String?      @db.VarChar(200)
+  condition        Condition    @default(NEW)
+  status           AssetStatus  @default(AVAILABLE)
+  isBookable       Boolean      @default(false) @map("is_bookable")
+  createdBy        String?      @map("created_by") @db.Uuid
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  deletedAt        DateTime?    @map("deleted_at")
+
+  category         AssetCategory @relation(fields: [categoryId], references: [id])
+  creator          User?         @relation(fields: [createdBy], references: [id])
+  images           AssetImage[]
+  documents        AssetDocument[]
+  history          AssetHistory[]
+
+  @@index([assetTag])
+  @@index([serialNumber])
+  @@index([status])
+  @@index([categoryId])
+  @@index([location])
+  @@map("assets")
+}
+
+model AssetImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  assetId      String   @map("asset_id") @db.Uuid
+  imageUrl     String   @map("image_url") @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_images")
+}
+
+model AssetDocument {
+  id           String   @id @default(uuid()) @db.Uuid
+  assetId      String   @map("asset_id") @db.Uuid
+  documentName String   @map("document_name") @db.VarChar(255)
+  documentUrl  String   @map("document_url") @db.Text
+  documentType String   @map("document_type") @db.VarChar(50)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_documents")
+}
+
+model AssetHistory {
+  id             String   @id @default(uuid()) @db.Uuid
+  assetId        String   @map("asset_id") @db.Uuid
+  action         String   @db.VarChar(100)
+  previousValue  String?  @map("previous_value") @db.Text
+  newValue       String?  @map("new_value") @db.Text
+  performedBy    String?  @map("performed_by") @db.Uuid
+  performedAt    DateTime @default(now()) @map("performed_at")
+  remarks        String?  @db.Text
+
+  asset          Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  performer      User?    @relation(fields: [performedBy], references: [id])
+
+  @@map("asset_history")
 }
