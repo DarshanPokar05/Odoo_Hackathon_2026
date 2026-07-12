@@ -1,0 +1,96 @@
+# ─────────────────────────────────────────────────────────────────
+# AssetFlow Monorepo — .gitignore
+# ─────────────────────────────────────────────────────────────────
+
+# ── AI Prompts & Internal Notes (keep private) ───────────────────
+ai-prompts/
+Documents/
+
+# ── Dependencies ─────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ── Build Outputs ────────────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+*.tsbuildinfo
+
+# ── Environment Variables (NEVER commit secrets) ─────────────────
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# ── Logs ─────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── Test & Coverage ──────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# ── Cache & Temp ─────────────────────────────────────────────────
+.cache/
+.turbo/
+.eslintcache
+.stylelintcache
+*.tgz
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDEs & Editors ───────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── Database ─────────────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+
+# ── Docker ───────────────────────────────────────────────────────
+# (docker-compose.yml is committed; local overrides are not)
+docker-compose.override.yml
+
+# ── Prisma ───────────────────────────────────────────────────────
+# Migrations are committed; generated client is not
+apps/api/node_modules/
+apps/api/dist/
+
+# ── Next.js (web app) ────────────────────────────────────────────
+apps/web/.next/
+apps/web/out/
+apps/web/node_modules/
+
+# ── Packages ─────────────────────────────────────────────────────
+packages/*/dist/
+packages/*/node_modules/
+
+# ── Miscellaneous ────────────────────────────────────────────────
+*.pem
+*.key
+*.cert

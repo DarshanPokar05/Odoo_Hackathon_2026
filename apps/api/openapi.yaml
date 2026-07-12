@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: AssetFlow API
+  version: 1.0.0
+  description: API Documentation for AssetFlow Enterprise Asset & Resource Management System
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server
+paths:
+  /auth/register:
+    post:
+      summary: Register a new employee
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                departmentId:
+                  type: string
+      responses:
+        '201':
+          description: Registration successful
+  /auth/login:
+    post:
+      summary: Login to AssetFlow
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+  /auth/refresh:
+    post:
+      summary: Refresh JWT token
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+  /auth/forgot-password:
+    post:
+      summary: Forgot password
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Request sent
+  /auth/reset-password:
+    post:
+      summary: Reset password
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successful
+  /auth/logout:
+    post:
+      summary: Logout
+      tags: [Authentication]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+
+  /organization/departments:
+    get:
+      summary: Get all departments
+      tags: [Organization]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+    post:
+      summary: Create a department
+      tags: [Organization]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+      responses:
+        '201':
+          description: Created
+  /organization/departments/{id}:
+    get:
+      summary: Get a department
+      tags: [Organization]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+    patch:
+      summary: Update a department
+      tags: [Organization]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Deactivate a department
+      tags: [Organization]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deactivated
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
