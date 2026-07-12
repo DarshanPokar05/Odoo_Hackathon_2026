@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { UserController } from './user.controller';
 import { validate } from '../../middlewares/validationMiddleware';
+import { ActivityController } from '../activity/activity.controller';
 import { authenticate, authorize } from '../../middlewares/authMiddleware';
 import {
   CreateUserSchema,
@@ -23,6 +24,7 @@ router.patch('/me/password', validate(ChangePasswordSchema), UserController.chan
 router.post('/', authorize('ADMIN'), validate(CreateUserSchema), UserController.create);
 router.get('/', UserController.getAll);
 router.get('/:id', UserController.getById);
+router.get('/:id/activity', ActivityController.getUserLogs);
 router.patch('/:id', authorize('ADMIN'), validate(UpdateUserSchema), UserController.update);
 router.patch('/:id/role', authorize('ADMIN'), validate(AssignRoleSchema), UserController.assignRole);
 router.patch('/:id/activate', authorize('ADMIN'), UserController.activate);

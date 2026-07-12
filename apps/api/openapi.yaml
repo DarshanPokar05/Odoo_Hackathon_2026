@@ -446,6 +446,143 @@ paths:
         '200':
           description: Booking cancelled successfully
 
+  /reports/assets:
+    get:
+      summary: Get Asset Utilization Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/allocations:
+    get:
+      summary: Get Allocation Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/maintenance:
+    get:
+      summary: Get Maintenance Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/bookings:
+    get:
+      summary: Get Booking Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/audits:
+    get:
+      summary: Get Audit Report
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /reports/export/csv:
+    get:
+      summary: Export Assets CSV
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: CSV Stream
+  /reports/export/excel:
+    get:
+      summary: Export Assets Excel
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Excel Stream
+  /reports/export/pdf:
+    get:
+      summary: Export Assets PDF
+      tags: [Reports]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: PDF Stream
+
+  /activity-logs:
+    get:
+      summary: Get Activity Logs (Admin)
+      tags: [Activity Logs]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+  /activity-logs/export:
+    get:
+      summary: Export Activity Logs (Admin)
+      tags: [Activity Logs]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: File Stream
+  /activity-logs/{id}:
+    get:
+      summary: Get Activity Log By Id
+      tags: [Activity Logs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /users/{id}/activity:
+    get:
+      summary: Get user activity
+      tags: [Activity Logs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /assets/{id}/activity:
+    get:
+      summary: Get asset activity
+      tags: [Activity Logs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+
 components:
   securitySchemes:
     bearerAuth:
