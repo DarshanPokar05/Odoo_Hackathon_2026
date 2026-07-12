@@ -4,6 +4,7 @@ import authRoutes from './modules/auth/auth.routes';
 import organizationRoutes from './modules/organization/organization.routes';
 import userRoutes from './modules/user/user.routes';
 import assetRoutes from './modules/asset/asset.routes';
+import bookingRoutes, { resourceRoutes } from './modules/booking/booking.routes';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
@@ -16,6 +17,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/organization', organizationRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/assets', assetRoutes);
+app.use('/api/v1/resources', resourceRoutes);
+app.use('/api/v1/bookings', bookingRoutes);
 
 app.use(errorMiddleware);
 
