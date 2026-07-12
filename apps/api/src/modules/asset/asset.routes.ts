@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AssetController } from './asset.controller';
 import { validate } from '../../middlewares/validationMiddleware';
+import { ActivityController } from '../activity/activity.controller';
 import { authenticate, authorize } from '../../middlewares/authMiddleware';
 import { CreateAssetSchema, UpdateAssetSchema, AssetIdParamSchema } from './asset.schema';
 
@@ -46,6 +47,13 @@ router.get(
   authenticate,
   validate(AssetIdParamSchema),
   AssetController.getAssetTimeline
+);
+
+router.get(
+  '/:id/activity',
+  authenticate,
+  authorize('ASSET_MANAGER', 'SYSTEM_ADMIN', 'ADMIN'),
+  ActivityController.getAssetLogs
 );
 
 export default router;

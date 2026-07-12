@@ -9,6 +9,7 @@ import allocationRoutes from './modules/allocation/allocation.routes';
 import maintenanceRoutes from './modules/maintenance/maintenance.routes';
 import auditRoutes from './modules/audit/audit.routes';
 import reportRoutes from './modules/report/report.routes';
+import activityRoutes from './modules/activity/activity.routes';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/api/v1/allocations', allocationRoutes);
 app.use('/api/v1/maintenance', maintenanceRoutes);
 app.use('/api/v1/audits', auditRoutes);
 app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/activity-logs', activityRoutes);
 
 app.use(errorMiddleware);
 

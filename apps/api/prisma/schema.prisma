@@ -126,6 +126,9 @@ model ActivityLog {
   action     String   @db.VarChar(100)
   entityId   String?  @map("entity_id") @db.Uuid
   entityType String   @map("entity_type") @db.VarChar(50)
+  module     String?  @db.VarChar(50)
+  role       String?  @db.VarChar(50)
+  sessionId  String?  @map("session_id") @db.VarChar(255)
   oldValues  String?  @map("old_values") @db.Text
   newValues  String?  @map("new_values") @db.Text
   ipAddress  String?  @map("ip_address") @db.VarChar(45)
