@@ -17,6 +17,23 @@ export interface Asset {
   createdAt: string;
   updatedAt: string;
   category?: { id: string; name: string };
+  images?: AssetImage[];
+  documents?: AssetDocument[];
+}
+
+export interface AssetImage {
+  id?: string;
+  assetId?: string;
+  imageUrl: string;
+  displayOrder: number;
+}
+
+export interface AssetDocument {
+  id?: string;
+  assetId?: string;
+  documentName: string;
+  documentUrl: string;
+  documentType: string;
 }
 
 export interface AssetHistory {

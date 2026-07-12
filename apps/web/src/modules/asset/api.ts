@@ -2,16 +2,39 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchApi } from '../../services/api';
 import { Asset, AssetHistory } from './types';
 
-export function useAssets(params: { page: number; limit: number; search?: string }) {
+export interface UseAssetsParams {
+  page: number;
+  limit: number;
+  search?: string;
+  categoryId?: string;
+  status?: string;
+  condition?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export function useAssets(params: UseAssetsParams) {
   const queryParams = new URLSearchParams({
     page: params.page.toString(),
     limit: params.limit.toString(),
     ...(params.search && { search: params.search }),
+    ...(params.categoryId && { categoryId: params.categoryId }),
+    ...(params.status && { status: params.status }),
+    ...(params.condition && { condition: params.condition }),
+    ...(params.sortBy && { sortBy: params.sortBy }),
+    ...(params.sortOrder && { sortOrder: params.sortOrder }),
   });
 
   return useQuery<{ assets: Asset[]; total: number }>({
     queryKey: ['assets', params],
     queryFn: () => fetchApi(`/assets?${queryParams.toString()}`),
+  });
+}
+
+export function useCategories() {
+  return useQuery<any[]>({
+    queryKey: ['categories'],
+    queryFn: () => fetchApi('/organization/categories'),
   });
 }
 
