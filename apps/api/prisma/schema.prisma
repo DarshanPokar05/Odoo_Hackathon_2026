@@ -31,82 +31,115 @@ model Role {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   users       User[]
+  permissions RolePermission[]
 
   @@map("roles")
 }
 
-model Department {
+model Permission {
   id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique @db.VarChar(100)
-  code        String   @unique @db.VarChar(20)
+  action      String   @db.VarChar(50)
+  resource    String   @db.VarChar(50)
   description String?
-  managerId   String?  @map("manager_id") @db.Uuid
-  status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
 
-  users       User[]
+  roles RolePermission[]
+
+  @@unique([action, resource])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Department {
+  id                 String    @id @default(uuid()) @db.Uuid
+  name               String    @unique @db.VarChar(100)
+  code               String    @unique @db.VarChar(20)
+  description        String?
+  parentDepartmentId String?   @map("parent_department_id") @db.Uuid
+  headId             String?   @map("head_id") @db.Uuid
+  managerId          String?   @map("manager_id") @db.Uuid
+  status             Status    @default(ACTIVE)
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
+
+  parentDepartment Department?  @relation("DepartmentToDepartment", fields: [parentDepartmentId], references: [id])
+  childDepartments Department[] @relation("DepartmentToDepartment")
+  users            User[]
 
   @@map("departments")
 }
 
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
-  employeeCode  String?   @unique @map("employee_code") @db.VarChar(20)
-  firstName     String    @map("first_name") @db.VarChar(100)
-  lastName      String    @map("last_name") @db.VarChar(100)
-  email         String    @unique @db.VarChar(255)
-  password      String    @db.VarChar(255)
-  phone         String?   @db.VarChar(20)
-  roleId        String?   @map("role_id") @db.Uuid
-  departmentId  String?   @map("department_id") @db.Uuid
-  profileImage  String?   @map("profile_image") @db.Text
-  status        Status    @default(ACTIVE)
-  lastLogin     DateTime? @map("last_login")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  id           String    @id @default(uuid()) @db.Uuid
+  employeeCode String?   @unique @map("employee_code") @db.VarChar(20)
+  firstName    String    @map("first_name") @db.VarChar(100)
+  lastName     String    @map("last_name") @db.VarChar(100)
+  email        String    @unique @db.VarChar(255)
+  password     String    @db.VarChar(255)
+  phone        String?   @db.VarChar(20)
+  roleId       String?   @map("role_id") @db.Uuid
+  departmentId String?   @map("department_id") @db.Uuid
+  profileImage String?   @map("profile_image") @db.Text
+  status       Status    @default(ACTIVE)
+  lastLogin    DateTime? @map("last_login")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
 
-  role          Role?          @relation(fields: [roleId], references: [id])
-  department    Department?    @relation(fields: [departmentId], references: [id])
-  activityLogs  ActivityLog[]
-  bookings      Booking[]
-  createdAssets Asset[]
-  assetHistory  AssetHistory[]
+  role                Role?             @relation(fields: [roleId], references: [id])
+  department          Department?       @relation(fields: [departmentId], references: [id])
+  activityLogs        ActivityLog[]
+  bookings            Booking[]
+  createdAssets       Asset[]
+  assetHistory        AssetHistory[]
+  allocationsReceived AssetAllocation[] @relation("AllocatedTo")
+  allocationsCreated  AssetAllocation[] @relation("AllocatedBy")
+  transfersRequested  TransferRequest[] @relation("RequestedBy")
+  transfersReceived   TransferRequest[] @relation("RequestedTo")
 
   @@map("users")
 }
 
 model ActivityLog {
-  id         String          @id @default(uuid()) @db.Uuid
-  userId     String?         @map("user_id") @db.Uuid
-  action     String          @db.VarChar(100)
-  entityId   String?         @map("entity_id") @db.Uuid
-  entityType String          @map("entity_type") @db.VarChar(50)
-  oldValues  String?         @map("old_values") @db.Text
-  newValues  String?         @map("new_values") @db.Text
-  ipAddress  String?         @map("ip_address") @db.VarChar(45)
-  userAgent  String?         @map("user_agent") @db.Text
-  createdAt  DateTime        @default(now()) @map("created_at")
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(100)
+  entityId   String?  @map("entity_id") @db.Uuid
+  entityType String   @map("entity_type") @db.VarChar(50)
+  oldValues  String?  @map("old_values") @db.Text
+  newValues  String?  @map("new_values") @db.Text
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  user       User?           @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
   @@map("activity_logs")
 }
 
 model AssetCategory {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        String   @db.VarChar(100)
-  code        String   @unique @db.VarChar(20)
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(100)
+  code        String    @unique @db.VarChar(20)
   description String?
   metadata    Json?
-  status      Status   @default(ACTIVE)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  status      Status    @default(ACTIVE)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
-  assets      Asset[]
+  assets Asset[]
 
   @@map("asset_categories")
 }
@@ -127,32 +160,47 @@ enum AssetStatus {
   DISPOSED
 }
 
-model Asset {
-  id               String       @id @default(uuid()) @db.Uuid
-  assetTag         String       @unique @map("asset_tag") @db.VarChar(50)
-  name             String       @db.VarChar(150)
-  categoryId       String       @map("category_id") @db.Uuid
-  serialNumber     String?      @map("serial_number") @db.VarChar(100)
-  manufacturer     String?      @db.VarChar(100)
-  model            String?      @db.VarChar(100)
-  acquisitionDate  DateTime?    @map("acquisition_date") @db.Date
-  acquisitionCost  Decimal?     @map("acquisition_cost") @db.Decimal(10, 2)
-  currentValue     Decimal?     @map("current_value") @db.Decimal(10, 2)
-  location         String?      @db.VarChar(200)
-  condition        Condition    @default(NEW)
-  status           AssetStatus  @default(AVAILABLE)
-  isBookable       Boolean      @default(false) @map("is_bookable")
-  createdBy        String?      @map("created_by") @db.Uuid
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
-  deletedAt        DateTime?    @map("deleted_at")
+enum AllocationStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+  TRANSFERRED
+}
 
-  category         AssetCategory @relation(fields: [categoryId], references: [id])
-  creator          User?         @relation(fields: [createdBy], references: [id])
+enum TransferStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Asset {
+  id              String      @id @default(uuid()) @db.Uuid
+  assetTag        String      @unique @map("asset_tag") @db.VarChar(50)
+  name            String      @db.VarChar(150)
+  categoryId      String      @map("category_id") @db.Uuid
+  serialNumber    String?     @map("serial_number") @db.VarChar(100)
+  manufacturer    String?     @db.VarChar(100)
+  model           String?     @db.VarChar(100)
+  acquisitionDate DateTime?   @map("acquisition_date") @db.Date
+  acquisitionCost Decimal?    @map("acquisition_cost") @db.Decimal(10, 2)
+  currentValue    Decimal?    @map("current_value") @db.Decimal(10, 2)
+  location        String?     @db.VarChar(200)
+  condition       Condition   @default(NEW)
+  status          AssetStatus @default(AVAILABLE)
+  isBookable      Boolean     @default(false) @map("is_bookable")
+  createdBy       String?     @map("created_by") @db.Uuid
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  deletedAt       DateTime?   @map("deleted_at")
+
+  category         AssetCategory     @relation(fields: [categoryId], references: [id])
+  creator          User?             @relation(fields: [createdBy], references: [id])
   images           AssetImage[]
   documents        AssetDocument[]
   history          AssetHistory[]
   resources        Resource[]
+  allocations      AssetAllocation[]
+  transferRequests TransferRequest[]
 
   @@index([assetTag])
   @@index([serialNumber])
@@ -169,7 +217,7 @@ model AssetImage {
   displayOrder Int      @default(0) @map("display_order")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@map("asset_images")
 }
@@ -182,23 +230,23 @@ model AssetDocument {
   documentType String   @map("document_type") @db.VarChar(50)
   createdAt    DateTime @default(now()) @map("created_at")
 
-  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@map("asset_documents")
 }
 
 model AssetHistory {
-  id             String   @id @default(uuid()) @db.Uuid
-  assetId        String   @map("asset_id") @db.Uuid
-  action         String   @db.VarChar(100)
-  previousValue  String?  @map("previous_value") @db.Text
-  newValue       String?  @map("new_value") @db.Text
-  performedBy    String?  @map("performed_by") @db.Uuid
-  performedAt    DateTime @default(now()) @map("performed_at")
-  remarks        String?  @db.Text
+  id            String   @id @default(uuid()) @db.Uuid
+  assetId       String   @map("asset_id") @db.Uuid
+  action        String   @db.VarChar(100)
+  previousValue String?  @map("previous_value") @db.Text
+  newValue      String?  @map("new_value") @db.Text
+  performedBy   String?  @map("performed_by") @db.Uuid
+  performedAt   DateTime @default(now()) @map("performed_at")
+  remarks       String?  @db.Text
 
-  asset          Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  performer      User?    @relation(fields: [performedBy], references: [id])
+  asset     Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  performer User? @relation(fields: [performedBy], references: [id])
 
   @@map("asset_history")
 }
@@ -251,4 +299,47 @@ model Booking {
   @@index([startTime, endTime])
   @@index([status])
   @@map("bookings")
+}
+
+model AssetAllocation {
+  id                 String           @id @default(uuid()) @db.Uuid
+  assetId            String           @map("asset_id") @db.Uuid
+  allocatedTo        String           @map("allocated_to") @db.Uuid
+  allocatedBy        String           @map("allocated_by") @db.Uuid
+  allocationDate     DateTime         @default(now()) @map("allocation_date")
+  expectedReturnDate DateTime?        @map("expected_return_date") @db.Date
+  actualReturnDate   DateTime?        @map("actual_return_date") @db.Date
+  status             AllocationStatus @default(ACTIVE)
+  conditionBefore    Condition        @default(NEW) @map("condition_before")
+  conditionAfter     Condition?       @map("condition_after")
+  remarks            String?          @db.Text
+  createdAt          DateTime         @default(now()) @map("created_at")
+
+  asset           Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  userAllocatedTo User  @relation("AllocatedTo", fields: [allocatedTo], references: [id])
+  userAllocatedBy User  @relation("AllocatedBy", fields: [allocatedBy], references: [id])
+
+  @@index([assetId])
+  @@index([allocatedTo])
+  @@index([status])
+  @@map("asset_allocations")
+}
+
+model TransferRequest {
+  id                   String         @id @default(uuid()) @db.Uuid
+  assetId              String         @map("asset_id") @db.Uuid
+  requestedBy          String         @map("requested_by") @db.Uuid
+  requestedTo          String         @map("requested_to") @db.Uuid
+  departmentApproval   Boolean        @default(false) @map("department_approval")
+  assetManagerApproval Boolean        @default(false) @map("asset_manager_approval")
+  status               TransferStatus @default(PENDING)
+  reason               String?        @db.Text
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  asset           Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  userRequestedBy User  @relation("RequestedBy", fields: [requestedBy], references: [id])
+  userRequestedTo User  @relation("RequestedTo", fields: [requestedTo], references: [id])
+
+  @@map("transfer_requests")
 }
