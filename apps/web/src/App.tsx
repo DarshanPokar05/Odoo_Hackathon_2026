@@ -1,11 +1,13 @@
-import React from 'react'
+import React from 'react';
+import { AppProvider } from '@/providers/AppProvider';
+import { AppRouter } from '@/routes';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-gray-900">AssetFlow</h1>
-    </div>
-  )
+    <AppProvider>
+      <AppRouter />
+    </AppProvider>
+  );
 }
 
-export default App
+export default App;
