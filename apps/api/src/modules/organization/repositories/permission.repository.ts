@@ -18,8 +18,12 @@ export class PermissionRepository {
     return prisma.permission.findUnique({ where: { id } });
   }
 
-  static async findByName(name: string) {
-    return prisma.permission.findUnique({ where: { name } });
+  static async findByActionAndResource(action: string, resource: string) {
+    return prisma.permission.findUnique({
+      where: {
+        action_resource: { action, resource }
+      }
+    });
   }
 
   static async findAll() {

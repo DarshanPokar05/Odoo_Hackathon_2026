@@ -5,7 +5,7 @@ import { CreateCategoryDTO, UpdateCategoryDTO } from '../organization.dto';
 export class CategoryRepository {
   static async create(data: CreateCategoryDTO) {
     // Cast metadata to Prisma's JSON-compatible type
-    return prisma.assetCategory.create({ data: { ...data, metadata: data.metadata ? (data.metadata as Prisma.InputJsonValue) : null } });
+    return prisma.assetCategory.create({ data: { ...data, metadata: data.metadata ? (data.metadata as Prisma.InputJsonValue) : (null as any) } });
   }
 
   static async update(id: string, data: UpdateCategoryDTO) {

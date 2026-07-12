@@ -61,11 +61,11 @@ export class AuthService {
     }
 
     const accessToken = jwt.sign({ id: user.id, role: user.roleId }, JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+      expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any,
     });
 
     const refreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as any,
     });
 
     await prisma.$transaction(async (tx) => {
@@ -107,11 +107,11 @@ export class AuthService {
       }
 
       const accessToken = jwt.sign({ id: user.id, role: user.roleId }, JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+        expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any,
       });
 
       const newRefreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+        expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as any,
       });
 
       return { accessToken, refreshToken: newRefreshToken };

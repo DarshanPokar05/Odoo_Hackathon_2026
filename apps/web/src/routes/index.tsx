@@ -12,8 +12,15 @@ import { EditAssetPage } from '@/modules/asset/pages/EditAssetPage';
 import { AssetDetailsPage } from '@/modules/asset/pages/AssetDetailsPage';
 import { AllocationListPage } from '@/modules/allocation/pages/AllocationListPage';
 
+import {
+  LoginPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  SessionExpiredPage,
+  AccessDeniedPage,
+} from '@/modules/auth';
+
 // Temporary Mock Pages for Routing Setup
-const MockLogin = () => <div className="p-8 bg-card rounded-xl border border-border shadow-sm text-center"><h2 className="text-2xl font-bold mb-4">Login Page</h2><button className="px-4 py-2 bg-primary text-primary-foreground rounded-md" onClick={() => localStorage.setItem('auth_token', 'mock_token')}>Mock Login</button></div>;
 const MockDashboard = () => <div><h1 className="text-3xl font-bold">Dashboard</h1><p className="mt-4 text-muted-foreground">Welcome to AssetFlow.</p></div>;
 const MockNotFound = () => <div><h1 className="text-3xl font-bold">404 - Not Found</h1></div>;
 
@@ -25,8 +32,10 @@ export function AppRouter() {
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
           <Route element={<PublicLayout />}>
-            <Route path="/login" element={<MockLogin />} />
-            <Route path="/forgot-password" element={<div>Forgot Password</div>} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/session-expired" element={<SessionExpiredPage />} />
           </Route>
         </Route>
 
@@ -48,6 +57,7 @@ export function AppRouter() {
             <Route path="/reports" element={<div>Reports</div>} />
             <Route path="/activity-logs" element={<div>Activity Logs</div>} />
             <Route path="/settings" element={<div>Settings</div>} />
+            <Route path="/access-denied" element={<AccessDeniedPage />} />
           </Route>
         </Route>
 

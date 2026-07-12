@@ -8,13 +8,14 @@ export class RoleRepository {
     return prisma.role.create({
       data: {
         ...roleData,
-        rolePermissions: {
+        type: roleData.type as any,
+        permissions: {
           create: permissionIds?.map(permissionId => ({
             permission: { connect: { id: permissionId } }
           })) || []
         }
       },
-      include: { rolePermissions: { include: { permission: true } } }
+      include: { permissions: { include: { permission: true } } }
     });
   }
 
@@ -25,7 +26,10 @@ export class RoleRepository {
       // First update basic role details
       const _updatedRole = await tx.role.update({
         where: { id },
-        data: roleData,
+        data: {
+          ...roleData,
+          type: roleData.type ? (roleData.type as any) : undefined
+        },
       });
 
       // If permissions are provided, sync them
@@ -46,7 +50,7 @@ export class RoleRepository {
 
       return tx.role.findUnique({
         where: { id },
-        include: { rolePermissions: { include: { permission: true } } }
+        include: { permissions: { include: { permission: true } } }
       });
     });
   }
@@ -58,7 +62,7 @@ export class RoleRepository {
   static async findById(id: string) {
     return prisma.role.findUnique({
       where: { id },
-      include: { rolePermissions: { include: { permission: true } } }
+      include: { permissions: { include: { permission: true } } }
     });
   }
 
@@ -68,7 +72,7 @@ export class RoleRepository {
 
   static async findAll() {
     return prisma.role.findMany({
-      include: { rolePermissions: { include: { permission: true } } }
+      include: { permissions: { include: { permission: true } } }
     });
   }
 }

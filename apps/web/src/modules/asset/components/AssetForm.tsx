@@ -26,7 +26,7 @@ interface AssetFormProps {
 
 export function AssetForm({ initialData, onSubmit, isLoading }: AssetFormProps) {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       name: initialData?.name || '',
       categoryId: initialData?.categoryId || '',

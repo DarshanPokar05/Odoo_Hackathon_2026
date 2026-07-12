@@ -5,9 +5,9 @@ import prisma from '../../../infrastructure/database/prisma';
 
 export class PermissionService {
   static async create(data: CreatePermissionDTO, userId: string) {
-    const existingName = await PermissionRepository.findByName(data.name);
-    if (existingName) {
-      throw new BusinessRuleError('Permission name must be unique');
+    const existing = await PermissionRepository.findByActionAndResource(data.action, data.resource);
+    if (existing) {
+      throw new BusinessRuleError('Permission with this action and resource already exists');
     }
 
     const permission = await PermissionRepository.create(data);
@@ -30,10 +30,13 @@ export class PermissionService {
       throw new NotFoundError('Permission not found');
     }
 
-    if (data.name && data.name !== permission.name) {
-      const existingName = await PermissionRepository.findByName(data.name);
-      if (existingName) {
-        throw new BusinessRuleError('Permission name must be unique');
+    const newAction = data.action ?? permission.action;
+    const newResource = data.resource ?? permission.resource;
+
+    if (newAction !== permission.action || newResource !== permission.resource) {
+      const existing = await PermissionRepository.findByActionAndResource(newAction, newResource);
+      if (existing) {
+        throw new BusinessRuleError('Permission with this action and resource already exists');
       }
     }
 

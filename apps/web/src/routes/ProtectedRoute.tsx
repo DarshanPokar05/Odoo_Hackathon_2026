@@ -16,7 +16,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />; // Or to a 403 Forbidden page
+    return <Navigate to="/access-denied" replace />;
   }
 
   return (

@@ -41,6 +41,7 @@ export const UpdateCategorySchema = z.object({
 export const CreateRoleSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Role name is required'),
+    type: z.enum(['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD', 'EMPLOYEE']),
     description: z.string().optional(),
     permissionIds: z.array(z.string().uuid()).optional(),
   }),
@@ -49,6 +50,7 @@ export const CreateRoleSchema = z.object({
 export const UpdateRoleSchema = z.object({
   body: z.object({
     name: z.string().min(1).optional(),
+    type: z.enum(['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD', 'EMPLOYEE']).optional(),
     description: z.string().optional().nullable(),
     permissionIds: z.array(z.string().uuid()).optional(),
   }),
@@ -56,14 +58,16 @@ export const UpdateRoleSchema = z.object({
 
 export const CreatePermissionSchema = z.object({
   body: z.object({
-    name: z.string().min(1, 'Permission name is required'),
+    action: z.string().min(1, 'Action is required'),
+    resource: z.string().min(1, 'Resource is required'),
     description: z.string().optional(),
   }),
 });
 
 export const UpdatePermissionSchema = z.object({
   body: z.object({
-    name: z.string().min(1).optional(),
+    action: z.string().min(1).optional(),
+    resource: z.string().min(1).optional(),
     description: z.string().optional().nullable(),
   }),
 });

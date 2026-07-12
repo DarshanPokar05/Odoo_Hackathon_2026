@@ -33,7 +33,7 @@ export class AuthController {
   static async logout(req: Request, res: Response, next: NextFunction) {
     try {
       // req.user is set by authMiddleware
-      await AuthService.logout(req.user.id);
+      await AuthService.logout(req.user!.id);
       return sendSuccess(res, null, 'Logout successful', 200);
     } catch (error) {
       next(error);
