@@ -84,6 +84,7 @@ model User {
   role          Role?       @relation(fields: [roleId], references: [id])
   department    Department? @relation(fields: [departmentId], references: [id])
   activityLogs  ActivityLog[]
+  bookings      Booking[]
 
   @@map("users")
 }
@@ -118,3 +119,53 @@ model AssetCategory {
 
   @@map("asset_categories")
 }
+
+enum BookingStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model Resource {
+  id           String    @id @default(uuid()) @db.Uuid
+  assetId      String?   @map("asset_id") @db.Uuid
+  name         String    @db.VarChar(100)
+  resourceType String    @map("resource_type") @db.VarChar(50)
+  capacity     Int       @default(1)
+  location     String    @db.VarChar(255)
+  status       Status    @default(ACTIVE)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  bookings     Booking[]
+
+  @@index([resourceType])
+  @@index([status])
+  @@index([location])
+  @@map("resources")
+}
+
+model Booking {
+  id         String        @id @default(uuid()) @db.Uuid
+  resourceId String        @map("resource_id") @db.Uuid
+  bookedBy   String        @map("booked_by") @db.Uuid
+  startTime  DateTime      @map("start_time")
+  endTime    DateTime      @map("end_time")
+  purpose    String        @db.VarChar(255)
+  status     BookingStatus @default(UPCOMING)
+  remarks    String?       @db.Text
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  resource   Resource      @relation(fields: [resourceId], references: [id])
+  booker     User          @relation(fields: [bookedBy], references: [id])
+
+  @@index([resourceId])
+  @@index([bookedBy])
+  @@index([startTime, endTime])
+  @@index([status])
+  @@map("bookings")
+}
+
