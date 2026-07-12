@@ -208,6 +208,10 @@ export class BookingService {
         newEnd.getTime() !== existingBooking.endTime.getTime();
 
       if (timeChanged) {
+        const now = new Date();
+        if (newStart.getTime() < now.getTime()) {
+          throw new BusinessRuleError('Cannot reschedule bookings to the past');
+        }
         const overlaps = await BookingRepository.findOverlappingBookings(
           existingBooking.resourceId,
           newStart,
