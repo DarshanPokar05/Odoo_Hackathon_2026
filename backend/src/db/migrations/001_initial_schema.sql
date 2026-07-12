@@ -1,0 +1,37 @@
+-- 001_initial_schema.sql
+-- Initial schema setup for AssetFlow
+
+CREATE TABLE IF NOT EXISTS users (
+  id VARCHAR(64) PRIMARY KEY DEFAULT 'usr_' || md5(random()::text || clock_timestamp()::text),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  full_name VARCHAR(255) NOT NULL,
+  role VARCHAR(50) NOT NULL DEFAULT 'employee',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+  id VARCHAR(64) PRIMARY KEY,
+  name VARCHAR(150) UNIQUE NOT NULL,
+  code VARCHAR(50) UNIQUE NOT NULL,
+  head_name VARCHAR(150),
+  status VARCHAR(50) DEFAULT 'active'
+);
+
+CREATE TABLE IF NOT EXISTS categories (
+  id VARCHAR(64) PRIMARY KEY,
+  name VARCHAR(150) UNIQUE NOT NULL,
+  code VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS assets (
+  id VARCHAR(64) PRIMARY KEY,
+  asset_tag VARCHAR(50) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  category_id VARCHAR(64) REFERENCES categories(id),
+  status VARCHAR(50) NOT NULL DEFAULT 'available',
+  location VARCHAR(255),
+  assignee_id VARCHAR(64) REFERENCES users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
